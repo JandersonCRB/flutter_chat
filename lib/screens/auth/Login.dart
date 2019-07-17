@@ -1,6 +1,8 @@
-
+import 'dart:convert';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_chat/services/Network.dart';
+import 'package:http/http.dart' as http;
 import 'package:flutter_chat/blocs/userBloc.dart';
 import 'package:flutter_chat/screens/auth/signUp.dart';
 
@@ -36,6 +38,8 @@ class MyHomePage extends StatefulWidget {
 
 class _MyHomePageState extends State<MyHomePage> {
   final _formKey = GlobalKey<FormState>();
+  bool _isLoading = false;
+  UserBloc userBloc;
 
   void redirectToSignUp(BuildContext context) {
     Navigator.push(
@@ -44,9 +48,48 @@ class _MyHomePageState extends State<MyHomePage> {
     );
   }
 
+  Widget renderBtnChild(BuildContext context) {
+    if (_isLoading) {
+      return Center(
+        child: SizedBox(
+          width: 15,
+          height: 15,
+          child: CircularProgressIndicator(
+            strokeWidth: 2,
+          ),
+        ),
+      );
+    } else {}
+    return Text(
+      "Login",
+      style: TextStyle(
+        color: Theme.of(context).primaryColor,
+      ),
+    );
+  }
+
+  void _login() {
+    UserBloc userBloc = BlocProvider.of<UserBloc>(context);
+    this.setState(() {
+      _isLoading = true;
+    });
+    http.post(Uri.encodeFull(Network.baseUrl + 'login'), body: {
+      "email": "jandersonangelo@hotmail.com",
+      "password": "123456",
+    }).then((resp) {
+      Map<String, dynamic> body = jsonDecode(resp.body);
+      this.setState(() {
+        _isLoading = false;
+      });
+      userBloc.changeToken.add(body['token']);
+    }).catchError((error) {
+      print(error);
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
-    final UserBloc userBloc = BlocProvider.of<UserBloc>(context);
+    UserBloc userBloc = BlocProvider.of<UserBloc>(context);
     return Scaffold(
       backgroundColor: Theme.of(context).primaryColor,
       body: Column(
@@ -107,14 +150,9 @@ class _MyHomePageState extends State<MyHomePage> {
                         shape: new RoundedRectangleBorder(
                           borderRadius: new BorderRadius.circular(30.0),
                         ),
-                        child: Text("Login",
-                            style: TextStyle(
-                              color: Theme.of(context).primaryColor,
-                            )),
+                        child: renderBtnChild(context),
                         color: Colors.white,
-                        onPressed: () {
-                          userBloc.changeToken.add('token');
-                        },
+                        onPressed: _login,
                       ),
                     ),
                     FlatButton(

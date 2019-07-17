@@ -6,7 +6,7 @@ class UserBloc implements BlocBase {
   String _token = '';
 
   StreamController<String> _tokenController = StreamController<String>();
-  Sink<String> get _inChange => _tokenController.sink;
+  Sink<String> get _inToken => _tokenController.sink;
   Stream<String> get outToken => _tokenController.stream;
 
   StreamController<String> _changeController = StreamController<String>();
@@ -25,6 +25,6 @@ class UserBloc implements BlocBase {
 
   void _change(data) {
     _token = data;
-    _inChange.add(_token);
+    _inToken.add(_token);
   }
 }
