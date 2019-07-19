@@ -89,7 +89,6 @@ class _MyHomePageState extends State<MyHomePage> {
 
   @override
   Widget build(BuildContext context) {
-    UserBloc userBloc = BlocProvider.of<UserBloc>(context);
     return Scaffold(
       backgroundColor: Theme.of(context).primaryColor,
       body: Column(
